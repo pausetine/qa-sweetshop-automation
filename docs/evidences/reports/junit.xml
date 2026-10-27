@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="9" skipped="0" tests="41" time="193.388" timestamp="2026-10-27T15:33:20.783298+08:00" hostname="postin"><testcase classname="tests.test_accessibility" name="test_TC_A11Y_001_page_has_unique_html_ids[login]" time="3.876" /><testcase classname="tests.test_accessibility" name="test_TC_A11Y_001_page_has_unique_html_ids[basket]" time="2.708"><failure message="AssertionError: Duplicate HTML IDs found on /basket: ['name']&#10;assert not ['name']">page = &lt;Page url='https://sweetshop.vivrichards.co.uk/basket'&gt;, path = '/basket'
+
+    @pytest.mark.accessibility
+    @pytest.mark.parametrize(
+        "path",
+        ["/login", "/basket"],
+        ids=["login", "basket"]
+    )
+    def test_TC_A11Y_001_page_has_unique_html_ids(page, path):
+        page.goto(path, wait_until="domcontentloaded")
+    
+        duplicate_ids = page.locator("[id]").evaluate_all(
+            """elements =&gt; {
+                const seen = new Set();
+                const duplicates = new Set();
+    
+                for (const el of elements) {
+                    if (seen.has(el.id)) {
+                        duplicates.add(el.id);
+                    }
+                    seen.add(el.id);
+                }
+    
+                return [...duplicates];
+            }"""
+        )
+    
+&gt;       assert not duplicate_ids, (
+            f"Duplicate HTML IDs found on {path}: "
+            f"{duplicate_ids}"
+        )
+E       AssertionError: Duplicate HTML IDs found on /basket: ['name']
+E       assert not ['name']
+
+tests\test_accessibility.py:33: AssertionError</failure></testcase><testcase classname="tests.test_accessibility" name="test_TC_A11Y_002_login_fields_have_accessible_names" time="1.336" /><testcase classname="tests.test_basket" name="test_TC_BAS_001_empty_basket_total_zero" time="3.055" /><testcase classname="tests.test_basket" name="test_TC_BAS_002_added_product_appears_in_basket" time="4.100" /><testcase classname="tests.test_basket" name="test_TC_BAS_003_two_products_have_correct_subtotal" time="5.418" /><testcase classname="tests.test_basket" name="test_TC_BAS_004_collect_shipping_is_free" time="3.746" /><testcase classname="tests.test_basket" name="test_TC_BAS_005_standard_shipping_adds_1_99" time="12.104"><failure message="AssertionError: assert '£2.34' in ' Sweet Shop\nSweets\nAbout\nLogin\n1 Basket\n(current)\nYour Basket\n\nPlease check your order details and then enter your payment and delivery details.\n\nYour Basket\n1\nSherbert Fountain\nx 1\nDelete Item\n£0.35\nTotal (GBP)\n£NaN\nDelivery\nCollect (FREE)\nStandard Shipping (£1.99)\nRedeem\nEmpty Basket\nBilling address\nFirst name\nLast name\nEmail\nAddress\nPostcode\nPayment\nName on card\nFull name as displayed on card\nCredit card number\nExpiration\nCVV\nConfirm Order\n\n\n\nSweet Shop Project 2018\n\n💬'&#10; +  where ' Sweet Shop\nSweets\nAbout\nLogin\n1 Basket\n(current)\nYour Basket\n\nPlease check your order details and then enter your payment and delivery details.\n\nYour Basket\n1\nSherbert Fountain\nx 1\nDelete Item\n£0.35\nTotal (GBP)\n£NaN\nDelivery\nCollect (FREE)\nStandard Shipping (£1.99)\nRedeem\nEmpty Basket\nBilling address\nFirst name\nLast name\nEmail\nAddress\nPostcode\nPayment\nName on card\nFull name as displayed on card\nCredit card number\nExpiration\nCVV\nConfirm Order\n\n\n\nSweet Shop Project 2018\n\n💬' = page_text(&lt;Page url='https://sweetshop.vivrichards.co.uk/basket'&gt;)">page = &lt;Page url='https://sweetshop.vivrichards.co.uk/basket'&gt;
+
+    @pytest.mark.positive
+    def test_TC_BAS_005_standard_shipping_adds_1_99(page):
+        shop_page(page)
+    
+        basket_badge = page.locator(
+            'a[href="/basket"] .badge'
+        )
+    
+        add_product(page, "Sherbert Fountain")
+        expect(basket_badge).to_have_text("1")
+    
+        basket_page(page)
+    
+        # Confirm product exists before shipping selection
+        expect(
+            page.get_by_text(
+                "Sherbert Fountain", exact=True
+            )
+        ).to_be_visible()
+    
+        print("BEFORE SHIPPING:", page_text(page))
+    
+        # Select standard shipping
+        page.locator(
+            'label[for="exampleRadios2"]'
+        ).click()
+    
+        expect(
+            page.locator("#exampleRadios2")
+        ).to_be_checked()
+    
+        print("AFTER SHIPPING:", page_text(page))
+    
+        # Verify product remains in the basket
+        expect(
+            page.get_by_text(
+                "Sherbert Fountain", exact=True
+            )
+        ).to_be_visible()
+    
+        # £0.35 + £1.99 = £2.34
+&gt;       assert "£2.34" in page_text(page)
+E       AssertionError: assert '£2.34' in ' Sweet Shop\nSweets\nAbout\nLogin\n1 Basket\n(current)\nYour Basket\n\nPlease check your order details and then enter your payment and delivery details.\n\nYour Basket\n1\nSherbert Fountain\nx 1\nDelete Item\n£0.35\nTotal (GBP)\n£NaN\nDelivery\nCollect (FREE)\nStandard Shipping (£1.99)\nRedeem\nEmpty Basket\nBilling address\nFirst name\nLast name\nEmail\nAddress\nPostcode\nPayment\nName on card\nFull name as displayed on card\nCredit card number\nExpiration\nCVV\nConfirm Order\n\n\n\nSweet Shop Project 2018\n\n💬'
+E        +  where ' Sweet Shop\nSweets\nAbout\nLogin\n1 Basket\n(current)\nYour Basket\n\nPlease check your order details and then enter your payment and delivery details.\n\nYour Basket\n1\nSherbert Fountain\nx 1\nDelete Item\n£0.35\nTotal (GBP)\n£NaN\nDelivery\nCollect (FREE)\nStandard Shipping (£1.99)\nRedeem\nEmpty Basket\nBilling address\nFirst name\nLast name\nEmail\nAddress\nPostcode\nPayment\nName on card\nFull name as displayed on card\nCredit card number\nExpiration\nCVV\nConfirm Order\n\n\n\nSweet Shop Project 2018\n\n💬' = page_text(&lt;Page url='https://sweetshop.vivrichards.co.uk/basket'&gt;)
+
+tests\test_basket.py:162: AssertionError</failure></testcase><testcase classname="tests.test_basket" name="test_TC_BAS_006_empty_promo_cannot_redeem" time="5.894" /><testcase classname="tests.test_catalog" name="test_TC_CAT_001_catalog_shows_key_products" time="5.194" /><testcase classname="tests.test_catalog" name="test_TC_CAT_002_price_matches_listed_product[chocolate-cups]" time="3.090" /><testcase classname="tests.test_catalog" name="test_TC_CAT_002_price_matches_listed_product[sherbert-straws]" time="2.378" /><testcase classname="tests.test_catalog" name="test_TC_CAT_002_price_matches_listed_product[sherbert-discs]" time="3.777" /><testcase classname="tests.test_catalog" name="test_TC_CAT_003_catalog_has_add_actions" time="3.528" /><testcase classname="tests.test_catalog" name="test_TC_CAT_004_cheapest_listed_product_price" time="2.613" /><testcase classname="tests.test_catalog" name="test_TC_CAT_005_highest_listed_product_price" time="2.089" /><testcase classname="tests.test_checkout" name="test_TC_CHK_001_empty_checkout_does_not_complete_order" time="5.689" /><testcase classname="tests.test_checkout" name="test_TC_CHK_002_missing_email_is_invalid" time="4.586" /><testcase classname="tests.test_checkout" name="test_TC_CHK_003_bad_postcode_format_is_rejected" time="3.114"><failure message="AssertionError: UK postcode format not validated&#10;assert not True&#10; +  where True = evaluate('el =&gt; el.checkValidity()')&#10; +    where evaluate = &lt;Locator frame=&lt;Frame name= url='https://sweetshop.vivrichards.co.uk/basket'&gt; selector='internal:attr=[placeholder=&quot;SW1A 1AA&quot;i]'&gt;.evaluate">page = &lt;Page url='https://sweetshop.vivrichards.co.uk/basket'&gt;
+
+    @pytest.mark.boundary
+    def test_TC_CHK_003_bad_postcode_format_is_rejected(page):
+        basket_page(page)
+        postcode = page.get_by_placeholder("SW1A 1AA")
+        postcode.fill("!")
+        # A one-character punctuation string should not be accepted as a UK postcode.
+        # This can surface missing validation in the deliberately buggy app.
+&gt;       assert not postcode.evaluate("el =&gt; el.checkValidity()"), "UK postcode format not validated"
+E       AssertionError: UK postcode format not validated
+E       assert not True
+E        +  where True = evaluate('el =&gt; el.checkValidity()')
+E        +    where evaluate = &lt;Locator frame=&lt;Frame name= url='https://sweetshop.vivrichards.co.uk/basket'&gt; selector='internal:attr=[placeholder="SW1A 1AA"i]'&gt;.evaluate
+
+tests\test_checkout.py:31: AssertionError</failure></testcase><testcase classname="tests.test_checkout" name="test_TC_CHK_004_invalid_postcodes_rejected[symbol]" time="4.384"><failure message="AssertionError: Invalid postcode accepted: !&#10;assert not True&#10; +  where True = evaluate('el =&gt; el.checkValidity()')&#10; +    where evaluate = &lt;Locator frame=&lt;Frame name= url='https://sweetshop.vivrichards.co.uk/basket'&gt; selector='#zip'&gt;.evaluate">page = &lt;Page url='https://sweetshop.vivrichards.co.uk/basket'&gt;, value = '!'
+
+    @pytest.mark.negative
+    @pytest.mark.parametrize(
+        "value",
+        ["!", "123", "ABCDE", "SW1A@1AA"],
+        ids=["symbol", "numbers", "letters", "special-character"]
+    )
+    def test_TC_CHK_004_invalid_postcodes_rejected(page, value):
+        basket_page(page)
+    
+        postcode = page.locator("#zip")
+        postcode.fill(value)
+    
+&gt;       assert not postcode.evaluate(
+            "el =&gt; el.checkValidity()"
+        ), f"Invalid postcode accepted: {value}"
+E       AssertionError: Invalid postcode accepted: !
+E       assert not True
+E        +  where True = evaluate('el =&gt; el.checkValidity()')
+E        +    where evaluate = &lt;Locator frame=&lt;Frame name= url='https://sweetshop.vivrichards.co.uk/basket'&gt; selector='#zip'&gt;.evaluate
+
+tests\test_checkout.py:47: AssertionError</failure></testcase><testcase classname="tests.test_checkout" name="test_TC_CHK_004_invalid_postcodes_rejected[numbers]" time="3.366"><failure message="AssertionError: Invalid postcode accepted: 123&#10;assert not True&#10; +  where True = evaluate('el =&gt; el.checkValidity()')&#10; +    where evaluate = &lt;Locator frame=&lt;Frame name= url='https://sweetshop.vivrichards.co.uk/basket'&gt; selector='#zip'&gt;.evaluate">page = &lt;Page url='https://sweetshop.vivrichards.co.uk/basket'&gt;, value = '123'
+
+    @pytest.mark.negative
+    @pytest.mark.parametrize(
+        "value",
+        ["!", "123", "ABCDE", "SW1A@1AA"],
+        ids=["symbol", "numbers", "letters", "special-character"]
+    )
+    def test_TC_CHK_004_invalid_postcodes_rejected(page, value):
+        basket_page(page)
+    
+        postcode = page.locator("#zip")
+        postcode.fill(value)
+    
+&gt;       assert not postcode.evaluate(
+            "el =&gt; el.checkValidity()"
+        ), f"Invalid postcode accepted: {value}"
+E       AssertionError: Invalid postcode accepted: 123
+E       assert not True
+E        +  where True = evaluate('el =&gt; el.checkValidity()')
+E        +    where evaluate = &lt;Locator frame=&lt;Frame name= url='https://sweetshop.vivrichards.co.uk/basket'&gt; selector='#zip'&gt;.evaluate
+
+tests\test_checkout.py:47: AssertionError</failure></testcase><testcase classname="tests.test_checkout" name="test_TC_CHK_004_invalid_postcodes_rejected[letters]" time="9.272"><failure message="AssertionError: Invalid postcode accepted: ABCDE&#10;assert not True&#10; +  where True = evaluate('el =&gt; el.checkValidity()')&#10; +    where evaluate = &lt;Locator frame=&lt;Frame name= url='https://sweetshop.vivrichards.co.uk/basket'&gt; selector='#zip'&gt;.evaluate">page = &lt;Page url='https://sweetshop.vivrichards.co.uk/basket'&gt;, value = 'ABCDE'
+
+    @pytest.mark.negative
+    @pytest.mark.parametrize(
+        "value",
+        ["!", "123", "ABCDE", "SW1A@1AA"],
+        ids=["symbol", "numbers", "letters", "special-character"]
+    )
+    def test_TC_CHK_004_invalid_postcodes_rejected(page, value):
+        basket_page(page)
+    
+        postcode = page.locator("#zip")
+        postcode.fill(value)
+    
+&gt;       assert not postcode.evaluate(
+            "el =&gt; el.checkValidity()"
+        ), f"Invalid postcode accepted: {value}"
+E       AssertionError: Invalid postcode accepted: ABCDE
+E       assert not True
+E        +  where True = evaluate('el =&gt; el.checkValidity()')
+E        +    where evaluate = &lt;Locator frame=&lt;Frame name= url='https://sweetshop.vivrichards.co.uk/basket'&gt; selector='#zip'&gt;.evaluate
+
+tests\test_checkout.py:47: AssertionError</failure></testcase><testcase classname="tests.test_checkout" name="test_TC_CHK_004_invalid_postcodes_rejected[special-character]" time="5.638"><failure message="AssertionError: Invalid postcode accepted: SW1A@1AA&#10;assert not True&#10; +  where True = evaluate('el =&gt; el.checkValidity()')&#10; +    where evaluate = &lt;Locator frame=&lt;Frame name= url='https://sweetshop.vivrichards.co.uk/basket'&gt; selector='#zip'&gt;.evaluate">page = &lt;Page url='https://sweetshop.vivrichards.co.uk/basket'&gt;, value = 'SW1A@1AA'
+
+    @pytest.mark.negative
+    @pytest.mark.parametrize(
+        "value",
+        ["!", "123", "ABCDE", "SW1A@1AA"],
+        ids=["symbol", "numbers", "letters", "special-character"]
+    )
+    def test_TC_CHK_004_invalid_postcodes_rejected(page, value):
+        basket_page(page)
+    
+        postcode = page.locator("#zip")
+        postcode.fill(value)
+    
+&gt;       assert not postcode.evaluate(
+            "el =&gt; el.checkValidity()"
+        ), f"Invalid postcode accepted: {value}"
+E       AssertionError: Invalid postcode accepted: SW1A@1AA
+E       assert not True
+E        +  where True = evaluate('el =&gt; el.checkValidity()')
+E        +    where evaluate = &lt;Locator frame=&lt;Frame name= url='https://sweetshop.vivrichards.co.uk/basket'&gt; selector='#zip'&gt;.evaluate
+
+tests\test_checkout.py:47: AssertionError</failure></testcase><testcase classname="tests.test_checkout" name="test_TC_CHK_005_invalid_billing_emails_rejected[missing-at]" time="5.327" /><testcase classname="tests.test_checkout" name="test_TC_CHK_005_invalid_billing_emails_rejected[missing-domain]" time="10.666" /><testcase classname="tests.test_checkout" name="test_TC_CHK_005_invalid_billing_emails_rejected[plain-text]" time="5.892" /><testcase classname="tests.test_checkout" name="test_TC_CHK_006_empty_first_name_rejected" time="4.163" /><testcase classname="tests.test_helpers" name="test_guest_add_to_basket" time="8.661" /><testcase classname="tests.test_images" name="test_TC_IMG_001_wham_bars_image_loads" time="4.162"><failure message="AssertionError: Wham Bar image failed to load: https://sweetshop.vivrichards.co.uk/img/whan.jpg&#10;assert False">page = &lt;Page url='https://sweetshop.vivrichards.co.uk/sweets'&gt;
+
+    def test_TC_IMG_001_wham_bars_image_loads(page):
+        shop_page(page)
+    
+        image = page.locator(
+            'img[alt="wham bar"]'
+        )
+    
+        assert image.count() == 1, (
+            "Expected exactly one Wham Bar image"
+        )
+    
+        image.scroll_into_view_if_needed()
+    
+        result = image.evaluate(
+            """img =&gt; ({
+                src: img.src,
+                loaded: img.complete &amp;&amp; img.naturalWidth &gt; 0
+            })"""
+        )
+    
+&gt;       assert result["loaded"], (
+            f"Wham Bar image failed to load: {result['src']}"
+        )
+E       AssertionError: Wham Bar image failed to load: https://sweetshop.vivrichards.co.uk/img/whan.jpg
+E       assert False
+
+tests\test_images.py:25: AssertionError</failure></testcase><testcase classname="tests.test_login" name="test_TC_LOG_001_documented_demo_accounts_can_login[one-order]" time="2.843" /><testcase classname="tests.test_login" name="test_TC_LOG_001_documented_demo_accounts_can_login[two-orders]" time="3.094" /><testcase classname="tests.test_login" name="test_TC_LOG_001_documented_demo_accounts_can_login[five-orders]" time="5.985" /><testcase classname="tests.test_login" name="test_TC_LOG_002_missing_email_rejected" time="5.313" /><testcase classname="tests.test_login" name="test_TC_LOG_003_bad_email_format_rejected[no-at]" time="3.277" /><testcase classname="tests.test_login" name="test_TC_LOG_003_bad_email_format_rejected[missing-domain]" time="2.314" /><testcase classname="tests.test_login" name="test_TC_LOG_004_missing_password_rejected" time="2.315" /><testcase classname="tests.test_login" name="test_TC_LOG_005_wrong_password_rejected" time="7.828"><failure message="AssertionError: Locator expected not to be visible&#10;Actual value: visible &#10;Call log:&#10;  - Expect &quot;not_to_be_visible&quot; get_by_role(&quot;heading&quot;, name=&quot;Your Account&quot;) with timeout 5000ms&#10;  - waiting for get_by_role(&quot;heading&quot;, name=&quot;Your Account&quot;)&#10;    13 × locator resolved to &lt;h1 class=&quot;display-3&quot;&gt;Your Account&lt;/h1&gt;&#10;       - unexpected value &quot;visible&quot;&#10;&#10;Aria snapshot:&#10;- heading &quot;Your Account&quot; [level=1]">page = &lt;Page url='https://sweetshop.vivrichards.co.uk/00efc23d-b605-4f31-b97b-6bb276de447e.html'&gt;
+
+    @pytest.mark.negative
+    def test_TC_LOG_005_wrong_password_rejected(page):
+        login_page(page)
+    
+        log_in(
+            page,
+            "oneorder@sweetshop.local",
+            "wrong-password"
+        )
+    
+        # Incorrect credentials must not grant account access
+        expect(
+            page.get_by_role(
+                "heading",
+                name="Your Account"
+            )
+&gt;       ).not_to_be_visible()
+          ^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Locator expected not to be visible
+E       Actual value: visible 
+E       Call log:
+E         - Expect "not_to_be_visible" get_by_role("heading", name="Your Account") with timeout 5000ms
+E         - waiting for get_by_role("heading", name="Your Account")
+E           13 × locator resolved to &lt;h1 class="display-3"&gt;Your Account&lt;/h1&gt;
+E              - unexpected value "visible"
+E       
+E       Aria snapshot:
+E       - heading "Your Account" [level=1]
+
+tests\test_login.py:73: AssertionError</failure></testcase><testcase classname="tests.test_navigation" name="test_TC_NAV_001_homepage_renders" time="2.053" /><testcase classname="tests.test_navigation" name="test_TC_NAV_002_browse_link_opens_catalog" time="3.456" /><testcase classname="tests.test_navigation" name="test_TC_NAV_003_about_describes_test_site" time="2.895" /><testcase classname="tests.test_navigation" name="test_TC_NAV_004_basket_route_opens" time="3.054" /></testsuite></testsuites>
