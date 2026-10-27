@@ -367,7 +367,7 @@ Each test uses an isolated browser context.
 
 Create a repository, for example:
 
-`github.com/pausetine/it-portfolio`
+`github.com/pausetine/qa-sweetshop-automation`
 
 From the project folder:
 
@@ -376,7 +376,7 @@ git init
 git add .
 git commit -m "Add verified Sweet Shop QA automation project"
 git branch -M main
-git remote add origin https://github.com/pausetine/it-portfolio
+git remote add origin https://github.com/pausetine/qa-sweetshop-automation
 git push -u origin main
 ```
 
