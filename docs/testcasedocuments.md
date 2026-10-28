@@ -760,4 +760,3 @@
 |---|---:|---:|---:|---|
 | Latest complete suite | 41 | 32 | 9 | 193.69 seconds |
 
-**Note:** The exact calendar date, browser version, screenshot contents and report filenames should be copied from the generated run artifacts before publication; do not infer them from file names or this document.
